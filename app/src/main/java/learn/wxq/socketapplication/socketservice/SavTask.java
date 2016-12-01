@@ -30,7 +30,9 @@ public class SavTask extends AsyncTask<Void, Void, Void> {
 
 
         if(a==1){
-            int b=sav.loginAction(time,logintype,device);
+          int b=sav.loginAction(time,logintype,device);
+
+      //      sav.nettyLoginAction();
         }
         return null;
     }

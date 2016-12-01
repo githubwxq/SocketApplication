@@ -46,8 +46,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
       //  startService(new Intent(this, MessageService.class)); //启动服务
-        nettyStart=new NettyClientBootstrap(this);
+   //     nettyStart=new NettyClientBootstrap(this,"58.211.191.72",10000);
         initView();
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,19 +64,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sing_chat.setOnClickListener(this);
 
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    nettyStart.startNetty();
-
-                    nettyStart.sendMessage("wxq");
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    nettyStart.startNetty();
+//
+//                    nettyStart.sendMessage("wxq");
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
 
 
         // 数据包
@@ -85,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private String getPacketData() {
+    private  byte[]  getPacketData() {
         String account="13222200760";
         String uid = "000000000000000000000000000000000000";
         String key = "accountnumber=" + "13222200760" + "&token=sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg&timestamp=" + getCurrentTime();
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         byte[] actiontype= WriteData.int2Bytes(packet.actiontype, 1);
-        byte[] cmdLength=WriteData.int2Bytes(packet.cmd.length(), 1);
+        byte[] cmdLength=WriteData.int2Bytes(packet.cmd.getBytes().length, 1);
 
         byte[] hebing2=  byteMerger(actiontype, cmdLength);
 
@@ -118,37 +121,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         byte[] packettime=DataUtil.longtoLH(packet.time);
         byte[] ostype=WriteData.int2Bytes(SocketGlobal.ostype, 1);
 
-
-//        os.write(int2Bytes(SocketGlobal.TITLE,1));
-//        os.write(int2Bytes(SocketGlobal.version,2));
-//        os.write(int2Bytes(packet.actiontype, 1));
-//        byte[] cmdByte = packet.cmd.getBytes();
-//        os.write(int2Bytes(cmdByte.length,1));
-//        byte[] uid=new byte[36];
-//        uid=packet.uid.getBytes();
-//        os.write(uid);
-//        byte[] touid=new byte[36];
-//        touid=packet.uid.getBytes();
-//        os.write(touid);
-////                      os.write(DataUtil.longtoLH(packet.time));
-//        os.write(DataUtil.longtoLH(packet.time));
-//        os.write(int2Bytes(SocketGlobal.ostype,1));
-//
-//        int count = finalArgs.getBytes().length + cmdByte.length;
-//        os.write(DataUtil.inttoLH(count));
-//        byte[] cmdAnddata = DataUtil.byteMerger(cmdByte, finalArgs.getBytes());
-//        os.write(cmdAnddata);
+        byte[] hebing4= byteMerger(packettime, ostype);
 
 
-        String args = packet.encodeArgs();
+        byte[] dataLength=new byte[4];
+        int count = packet.encodeArgs().getBytes().length +  packet.cmd.getBytes().length;
+        dataLength=DataUtil.inttoLH(count);
+
+        //总共90个字节 为协议 剩下位数据
+
+        byte[] cmdAnddata = DataUtil.byteMerger(packet.cmd.getBytes(), packet.encodeArgs().getBytes());
+
+        byte[] hebing5= byteMerger(dataLength, cmdAnddata);
+
+        //组合成一个字节数组
+
+        byte[] merger1= byteMerger(hebing1,hebing2);
+        byte[] merger2=byteMerger(merger1,hebing3);
+        byte[] merger3=byteMerger(merger2,hebing4);
+        //最后字节
+        byte[] merger4=byteMerger(merger3,hebing5);
 
 
-
-
-        return "";
+        return merger4;  //最后协议和数据
 
 
     }
+    public  String getCurrentTime() {
+        Date nowTime = new Date();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss.SSS");
+        String nowTimeStr = dateFormat.format(nowTime);
+        return nowTimeStr;
+    }
+
+
+
+    //java 合并两个byte数组
+    public  byte[] byteMerger(byte[] byte_1, byte[] byte_2){
+        byte[] byte_3 = new byte[byte_1.length+byte_2.length];
+        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
+        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
+        return byte_3;
+    }
+
+
+
+
+
 
     private void connectSocket() {
         //socket 连接
@@ -205,15 +226,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 showToast("socket退出登录");
 //                LoginOffReq cr = new LoginOffReq(uid, uid, "0");
 //                ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
-            ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+             ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
 
             break;
 
             case R.id.addfriend:
                 showToast("添加朋友");
                 AddFriendsReq cr = new AddFriendsReq(uid, uid2,photonumber2);
-                ShakeAndVibrate.getInstance(this).addPacket(cr);
-//                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+        //        ShakeAndVibrate.getInstance(this).addPacket(cr);
+                ShakeAndVibrate.getInstance(this).addNettyPacket(cr);
+//               ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
 
                 break;
 
@@ -250,22 +272,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public  String getCurrentTime() {
-        Date nowTime = new Date();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss.SSS");
-        String nowTimeStr = dateFormat.format(nowTime);
-        return nowTimeStr;
-    }
-
-
-
-    //java 合并两个byte数组
-    public  byte[] byteMerger(byte[] byte_1, byte[] byte_2){
-        byte[] byte_3 = new byte[byte_1.length+byte_2.length];
-        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
-        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
-        return byte_3;
-    }
 }
