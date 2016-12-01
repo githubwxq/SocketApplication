@@ -10,46 +10,159 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import learn.wxq.socketapplication.netty.NettyClientBootstrap;
+import learn.wxq.socketapplication.socketservice.DataUtil;
+import learn.wxq.socketapplication.socketservice.PacketModel.AddFriendsReq;
+import learn.wxq.socketapplication.socketservice.PacketModel.ChatMessageReq;
+import learn.wxq.socketapplication.socketservice.PacketModel.ConnectReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.LoginOffReq;
+import learn.wxq.socketapplication.socketservice.PacketModel.Packet;
 import learn.wxq.socketapplication.socketservice.ShakeAndVibrate;
+import learn.wxq.socketapplication.socketservice.SocketGlobal;
+import learn.wxq.socketapplication.socketservice.WriteData;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView connect;
     private TextView loginoff;
+    private TextView  addfriend;
+    private TextView  sing_chat;
+
+    NettyClientBootstrap nettyStart;
+
     String uid="e303fe70-5104-474d-a41e-87e79ec01b17";//wxq 账号
+    String uid2="5b0f35c5-311a-46f1-8b94-1306b4c8bc3e";//ty 账号
+    String photonumber1="13222200760";
+
+    String photonumber2="18862005675";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
       //  startService(new Intent(this, MessageService.class)); //启动服务
-
+        nettyStart=new NettyClientBootstrap(this);
         initView();
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //
-               connectSocket();
+                connectSocket();
             }
         });
         loginoff.setOnClickListener(this);
+        addfriend.setOnClickListener(this);
+        sing_chat.setOnClickListener(this);
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    nettyStart.startNetty();
+
+                    nettyStart.sendMessage("wxq");
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+
+        // 数据包
+
+
+        //    String data=getPacketData();
+
+
+
+    }
+
+    private String getPacketData() {
+        String account="13222200760";
+        String uid = "000000000000000000000000000000000000";
+        String key = "accountnumber=" + "13222200760" + "&token=sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg&timestamp=" + getCurrentTime();
+        String device="867516023966902";
+        long timesTamp=new Date().getTime();
+        String time=getCurrentTime();
+        Packet packet = new ConnectReq(uid, uid, account + "|" + key + "|" + " " + "|" + time + "|" + "0" + "|" + device, timesTamp);
+        byte[] biaoshi = WriteData.int2Bytes(SocketGlobal.TITLE, 1);
+        byte[] version = WriteData.int2Bytes(SocketGlobal.version,2);
+
+
+        byte[] hebing1=  byteMerger(biaoshi, version);
+
+
+        byte[] actiontype= WriteData.int2Bytes(packet.actiontype, 1);
+        byte[] cmdLength=WriteData.int2Bytes(packet.cmd.length(), 1);
+
+        byte[] hebing2=  byteMerger(actiontype, cmdLength);
+
+
+
+        byte[] packetuid=new byte[36];
+        packetuid=packet.uid.getBytes();
+
+        byte[] packettouid=new byte[36];
+        packettouid=packet.uid.getBytes();
+
+        byte[] hebing3=  byteMerger(actiontype, cmdLength);
+
+        byte[] packettime=DataUtil.longtoLH(packet.time);
+        byte[] ostype=WriteData.int2Bytes(SocketGlobal.ostype, 1);
+
+
+//        os.write(int2Bytes(SocketGlobal.TITLE,1));
+//        os.write(int2Bytes(SocketGlobal.version,2));
+//        os.write(int2Bytes(packet.actiontype, 1));
+//        byte[] cmdByte = packet.cmd.getBytes();
+//        os.write(int2Bytes(cmdByte.length,1));
+//        byte[] uid=new byte[36];
+//        uid=packet.uid.getBytes();
+//        os.write(uid);
+//        byte[] touid=new byte[36];
+//        touid=packet.uid.getBytes();
+//        os.write(touid);
+////                      os.write(DataUtil.longtoLH(packet.time));
+//        os.write(DataUtil.longtoLH(packet.time));
+//        os.write(int2Bytes(SocketGlobal.ostype,1));
+//
+//        int count = finalArgs.getBytes().length + cmdByte.length;
+//        os.write(DataUtil.inttoLH(count));
+//        byte[] cmdAnddata = DataUtil.byteMerger(cmdByte, finalArgs.getBytes());
+//        os.write(cmdAnddata);
+
+
+        String args = packet.encodeArgs();
+
+
+
+
+        return "";
+
+
     }
 
     private void connectSocket() {
         //socket 连接
         showToast("连接socket");
 
+
+
 //        LoginOffReq cr = new LoginOffReq(uid, uid, "1");
 //        ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
      //   new Intent()
 
 
-stopService(new Intent(this, MessageService.class));
+        stopService(new Intent(this, MessageService.class));
         startService(new Intent(this, MessageService.class));
-
-
-
-
-
 
     }
     public void showToast(String content) {
@@ -80,6 +193,9 @@ stopService(new Intent(this, MessageService.class));
     private void initView() {
         connect = (TextView) findViewById(R.id.connect);
         loginoff = (TextView) findViewById(R.id.loginoff);
+        addfriend=(TextView) findViewById(R.id.addfriend);
+        sing_chat=(TextView) findViewById(R.id.sing_chat);
+
     }
 
     @Override
@@ -87,14 +203,69 @@ stopService(new Intent(this, MessageService.class));
         switch (view.getId()){
             case R.id.loginoff:
                 showToast("socket退出登录");
-//
 //                LoginOffReq cr = new LoginOffReq(uid, uid, "0");
 //                ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
-                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+            ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+
+            break;
+
+            case R.id.addfriend:
+                showToast("添加朋友");
+                AddFriendsReq cr = new AddFriendsReq(uid, uid2,photonumber2);
+                ShakeAndVibrate.getInstance(this).addPacket(cr);
+//                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
 
                 break;
 
 
+            case R.id.sing_chat:
+                showToast("单聊");
+
+                JSONObject json = new JSONObject();
+
+                try {
+                    json.put("content","wxq");
+                    json.put("type","0");
+                    json.put("timeSend",getCurrentTime());
+                    json.put("nickname","王晓清");
+                    json.put("face","/data/psmg/2016/09/08/201609081512371237kxvtgz.png");
+
+                    ChatMessageReq singchat = new ChatMessageReq(uid, uid2, json.toString());
+                    boolean flag = ShakeAndVibrate.getInstance(this).addPacket(singchat);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+//                AddFriendsReq cr = new AddFriendsReq(uid, uid2,photonumber2);
+//                ShakeAndVibrate.getInstance(this).addPacket(cr);
+//                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+
+                break;
+
+
+
+
         }
+    }
+
+    public  String getCurrentTime() {
+        Date nowTime = new Date();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss.SSS");
+        String nowTimeStr = dateFormat.format(nowTime);
+        return nowTimeStr;
+    }
+
+
+
+    //java 合并两个byte数组
+    public  byte[] byteMerger(byte[] byte_1, byte[] byte_2){
+        byte[] byte_3 = new byte[byte_1.length+byte_2.length];
+        System.arraycopy(byte_1, 0, byte_3, 0, byte_1.length);
+        System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
+        return byte_3;
     }
 }

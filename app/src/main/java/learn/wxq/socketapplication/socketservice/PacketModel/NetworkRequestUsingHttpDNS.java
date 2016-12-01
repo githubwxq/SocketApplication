@@ -2,6 +2,7 @@ package learn.wxq.socketapplication.socketservice.PacketModel;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.alibaba.sdk.android.httpdns.DegradationFilter;
 import com.alibaba.sdk.android.httpdns.HttpDns;
@@ -140,6 +141,7 @@ public class NetworkRequestUsingHttpDNS {
 
     public static void showLog(String content, Throwable ex) {
         if (ex == null) {
+            Log.i("wxq",content);
       //      LogUtil.i(content);
         } else {
        //     LogUtil.i(content, ex);

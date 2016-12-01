@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SocketApplication.iml" filepath="$PROJECT_DIR$/SocketApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/minaDemo/minaDemo.iml" filepath="$PROJECT_DIR$/minaDemo/minaDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nettyclientAndroid/nettyclientAndroid.iml" filepath="$PROJECT_DIR$/nettyclientAndroid/nettyclientAndroid.iml" />
     </modules>
   </component>
 </project>

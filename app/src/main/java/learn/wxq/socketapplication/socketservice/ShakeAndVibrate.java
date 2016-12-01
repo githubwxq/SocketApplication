@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import learn.wxq.socketapplication.netty.NettyClientBootstrap;
 import learn.wxq.socketapplication.socketservice.PacketModel.ConnectReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.HeartbeatPingReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.NetworkRequestUsingHttpDNS;
@@ -31,10 +32,16 @@ import learn.wxq.socketapplication.socketservice.PacketModel.RePacket;
  */
 public class ShakeAndVibrate {
 
-    public String shuntHost = "";
+    public String shuntHost = ""; //逻辑服务器端口
     public int shuntPort = 0;
     public volatile Socket shuntSocket;
     private volatile Socket mainSocket;
+//
+//    public NettyClientBootstrap shuntSocket;
+//    public NettyClientBootstrap mainNetty;
+
+
+
     public volatile InputStream is;
     private volatile InputStream istime;
     public volatile OutputStream os;
@@ -96,21 +103,24 @@ public class ShakeAndVibrate {
     public int connectMain() {
         mainSocket = new Socket();
         try {
-            String ip = NetworkRequestUsingHttpDNS.mainSocket(context, SocketGlobal.HOST);
+            String ip = NetworkRequestUsingHttpDNS.mainSocket(context, SocketGlobal.HOST); // 获取ip
             mainSocket.connect(new InetSocketAddress(ip, SocketGlobal.PORT), SocketGlobal.CONNECT_TIMEOUT);
+
             is = mainSocket.getInputStream();
             os = mainSocket.getOutputStream();
+
             socketState = 1;//1代表分流服务器连接成功
-            if (is != null) {
+            if (is != null) { //有数据
                 return decodeMain();
             }
+
         } catch (ConnectException e) {
             if (mainSocket != null) {
                 mainSocket = null;
                 System.gc();
             }
             socketState = 0;//分流服务器连接失败
-            dataParseListener.connectionClosed(socketState);
+            dataParseListener.connectionClosed(socketState);  // 回吊错误信息
         } catch (SocketException e) {
             e.printStackTrace();
             inAnewConnectSocker(0);
@@ -134,7 +144,7 @@ public class ShakeAndVibrate {
         return 0;
     }
 
-    //读取主服务器返回的分流服务器的ip地址，端口号
+    //读取解析主服务器返回的分流服务器的ip地址，端口号
     private int decodeMain() throws IOException, JSONException, Exception {
         int cmdlength = 0;
         int cmdAndDatalength = 0;
@@ -143,7 +153,7 @@ public class ShakeAndVibrate {
         byte[] buf = new byte[90];
         int n = 0;
         boolean found = false;
-        RePacket rpacket = new RePacket();
+        RePacket rpacket = new RePacket(); // 包
 
         while (true) {
 //                int b = is.read();
@@ -340,7 +350,7 @@ public class ShakeAndVibrate {
                 writeData.encode(packet);
             } else {
             }
-//        socketState=3;//3代表逻辑服务器练级成功并登录成功
+            //  socketState=3;//3代表逻辑服务器练级成功并登录成功
             if (readData.readinfolink == null) {
                 readData = ReadData.getInstance(dataParseListener);
                 readData.readinfolink.writeThread.start();

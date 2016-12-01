@@ -24,16 +24,26 @@
         android:textSize="18sp"
         />
     <TextView
+        android:id="@+id/addfriend"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="其他"
+        android:text="添加朋友"
         android:gravity="center"
         android:textSize="18sp"
         />
     <TextView
+        android:id="@+id/sing_chat"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:text="123"
+        android:text="单聊"
+        android:gravity="center"
+        android:textSize="18sp"
+        />
+    <TextView
+        android:id="@+id/group_chat"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="群聊"
         android:gravity="center"
         android:textSize="18sp"
         />

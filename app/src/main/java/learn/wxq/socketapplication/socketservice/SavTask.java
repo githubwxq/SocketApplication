@@ -26,7 +26,9 @@ public class SavTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... params) {
 //        sav.loop();
-        int a=sav.connectMain();
+        int a=sav.connectMain(); // 连接分流服务器
+
+
         if(a==1){
             int b=sav.loginAction(time,logintype,device);
         }
