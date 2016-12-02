@@ -177,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-//        LoginOffReq cr = new LoginOffReq(uid, uid, "1");
-//        ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
+   //        LoginOffReq cr = new LoginOffReq(uid, uid, "1");
+   //        ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
      //   new Intent()
 
 
@@ -224,17 +224,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.loginoff:
                 showToast("socket退出登录");
-//                LoginOffReq cr = new LoginOffReq(uid, uid, "0");
-//                ShakeAndVibrate.getInstance(getApplicationContext()).addPacket(cr);
-             ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+                LoginOffReq cr = new LoginOffReq(uid, uid, "0");
+                ShakeAndVibrate.getInstance(getApplicationContext()).addNettyPacket(cr);
+ //            ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+
+
 
             break;
 
             case R.id.addfriend:
                 showToast("添加朋友");
-                AddFriendsReq cr = new AddFriendsReq(uid, uid2,photonumber2);
-        //        ShakeAndVibrate.getInstance(this).addPacket(cr);
-                ShakeAndVibrate.getInstance(this).addNettyPacket(cr);
+                AddFriendsReq cr2 = new AddFriendsReq(uid, uid2,photonumber2);
+        //      ShakeAndVibrate.getInstance(this).addPacket(cr2);
+           ShakeAndVibrate.getInstance(this).addNettyPacket(cr2);
 //               ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
 
                 break;
@@ -253,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     json.put("face","/data/psmg/2016/09/08/201609081512371237kxvtgz.png");
 
                     ChatMessageReq singchat = new ChatMessageReq(uid, uid2, json.toString());
-                    boolean flag = ShakeAndVibrate.getInstance(this).addPacket(singchat);
+                    boolean flag = ShakeAndVibrate.getInstance(this).addNettyPacket(singchat);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

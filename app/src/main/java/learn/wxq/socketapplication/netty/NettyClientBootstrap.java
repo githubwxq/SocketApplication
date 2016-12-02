@@ -63,10 +63,18 @@ public class NettyClientBootstrap {
             @Override
             public void run() {
                 try {
-                    if(start()){
+                    if(socketChannel==null){
+
+                        if(start()){
+                            ByteBuf bb = Unpooled.wrappedBuffer(msg);
+                            socketChannel.writeAndFlush(bb);
+                        }
+                    }else{
+
                         ByteBuf bb = Unpooled.wrappedBuffer(msg);
                         socketChannel.writeAndFlush(bb);
                     }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

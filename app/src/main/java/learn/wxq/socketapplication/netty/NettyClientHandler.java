@@ -8,6 +8,9 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
+import learn.wxq.socketapplication.socketservice.PacketModel.HeartbeatPingReq;
+import learn.wxq.socketapplication.socketservice.PacketModel.Packet;
+import learn.wxq.socketapplication.socketservice.WriteData;
 
 /**
  * Created by zpp on 2015/9/23.
@@ -42,7 +45,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
                      if(currentTime - lastClickTime > MIN_CLICK_DELAY_TIME){
                          lastClickTime = System.currentTimeMillis();
                          if(isPing){
-                         ByteBuf bb = Unpooled.wrappedBuffer("ping".getBytes(CharsetUtil.UTF_8));
+
+                             String uid = "000000000000000000000000000000000000";
+                             Packet heartbeatPacket = new HeartbeatPingReq(uid, uid, "");
+                           byte[] heart=  WriteData.getInstance().nettyEncodeByte(heartbeatPacket);
+
+                         ByteBuf bb = Unpooled.wrappedBuffer(heart);
                          ctx.writeAndFlush(bb);
                          System.out.println("send ping to server----------");}
                      }
@@ -58,7 +66,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
 //        byte[] bytes = new byte[ buf.readableBytes()];
 //        buf.readBytes(bytes);
         String msg1=((ByteBuf)baseMsg).toString(CharsetUtil.UTF_8).trim();
-        System.out.println("1111111111111111------------------------" + msg1);
         dataListener.dealWithData("data:" + msg1);
         ReferenceCountUtil.release(msg1);
     }

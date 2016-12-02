@@ -356,8 +356,8 @@ public class ShakeAndVibrate  {
             }
             if (packet != null) {
 
-             //  writeData.encode(packet); //给netty使用
-              writeData.nettyEncode(packet, shuntNetty);
+        //  writeData.encode(packet); //给netty使用
+            writeData.nettyEncode(packet, shuntNetty);
             } else {
             }
              socketState=3;//3代表逻辑服务器练级成功并登录成功
@@ -670,23 +670,26 @@ public class ShakeAndVibrate  {
     }
 
     public boolean addNettyPacket(Packet packetdata) {
-        try {
-
-            this.packet = packetdata;
-            if (writeData != null) {
-                packet.setTime(System.currentTimeMillis() + timedifference);
-                writeData.nettyEncode(packet, shuntNetty);
-            } else {
-                writeData = WriteData.getInstance();
-                packet.setTime(System.currentTimeMillis() + timedifference);
-                writeData.nettyEncode(packet, shuntNetty);
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            return false;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//
+//            this.packet = packetdata;
+//            if (writeData != null) {
+//                packet.setTime(System.currentTimeMillis() + timedifference);
+//                writeData.nettyEncode(packet, shuntNetty);
+//            } else {
+//                writeData = WriteData.getInstance();
+//                packet.setTime(System.currentTimeMillis() + timedifference);
+//                writeData.nettyEncode(packet, shuntNetty);
+//            }
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//            return false;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        writeData = WriteData.getInstance();
+        packetdata.setTime(System.currentTimeMillis() + timedifference);
+        writeData.nettyEncode(packetdata,shuntNetty);//shuntNetty
         return true;
     }
 
@@ -765,7 +768,8 @@ public class ShakeAndVibrate  {
 
 
             mainNetty.stopPing();
-
+            mainNetty=null;
+            System.gc();
             shuntNetty=new NettyClientBootstrap(context,ip,20000,new DataListenerImpl2());
 
 
@@ -868,4 +872,11 @@ public class ShakeAndVibrate  {
         return byte_3;
     }
 
+ public void  closeAll(){
+
+     shuntNetty=null;
+      mainNetty=null;
+
+     System.gc();
+ }
 }

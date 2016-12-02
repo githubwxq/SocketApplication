@@ -163,6 +163,63 @@ public class WriteData {
 
 
     }
+
+    public    byte[]  nettyEncodeByte(Packet packet) {
+
+        byte[] biaoshi = WriteData.int2Bytes(SocketGlobal.TITLE, 1);
+        byte[] version = WriteData.int2Bytes(SocketGlobal.version,2);
+
+        byte[] hebing1=  byteMerger(biaoshi, version);
+
+
+        byte[] actiontype= WriteData.int2Bytes(packet.actiontype, 1);
+        byte[] cmdLength=WriteData.int2Bytes(packet.cmd.getBytes().length, 1);
+
+        byte[] hebing2=  byteMerger(actiontype, cmdLength);
+
+
+
+        byte[] packetuid=new byte[36];
+        packetuid=packet.uid.getBytes();
+
+        byte[] packettouid=new byte[36];
+        packettouid=packet.uid.getBytes();
+
+        byte[] hebing3=  byteMerger(packetuid, packettouid);
+
+
+        byte[] packettime=DataUtil.longtoLH(packet.time);
+        byte[] ostype=WriteData.int2Bytes(SocketGlobal.ostype, 1);
+
+        byte[] hebing4= byteMerger(packettime, ostype);
+
+
+        byte[] dataLength=new byte[4];
+        int count = packet.encodeArgs().getBytes().length +  packet.cmd.getBytes().length;
+        dataLength=DataUtil.inttoLH(count);
+
+        //总共90个字节 为协议 剩下位数据
+
+        byte[] cmdAnddata = DataUtil.byteMerger(packet.cmd.getBytes(), packet.encodeArgs().getBytes());
+
+        byte[] hebing5= byteMerger(dataLength, cmdAnddata);
+
+        //组合成一个字节数组
+
+        byte[] merger1= byteMerger(hebing1,hebing2);
+        byte[] merger2=byteMerger(merger1,hebing3);
+        byte[] merger3=byteMerger(merger2,hebing4);
+        //最后字节
+        byte[] merger4=byteMerger(merger3,hebing5);
+
+
+       return  merger4;
+
+    }
+
+
+
+
     //java 合并两个byte数组
     public  byte[] byteMerger(byte[] byte_1, byte[] byte_2){
         byte[] byte_3 = new byte[byte_1.length+byte_2.length];
