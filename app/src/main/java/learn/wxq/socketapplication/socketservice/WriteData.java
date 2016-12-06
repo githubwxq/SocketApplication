@@ -124,7 +124,7 @@ public class WriteData {
         packetuid=packet.uid.getBytes();
 
         byte[] packettouid=new byte[36];
-        packettouid=packet.uid.getBytes();
+        packettouid=packet.toUid.getBytes();
 
         byte[] hebing3=  byteMerger(packetuid, packettouid);
 
@@ -183,7 +183,7 @@ public class WriteData {
         packetuid=packet.uid.getBytes();
 
         byte[] packettouid=new byte[36];
-        packettouid=packet.uid.getBytes();
+        packettouid=packet.toUid.getBytes();
 
         byte[] hebing3=  byteMerger(packetuid, packettouid);
 
