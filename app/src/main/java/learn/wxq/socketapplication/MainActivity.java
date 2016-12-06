@@ -244,17 +244,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.sing_chat:
                 showToast("单聊");
-
+//{"content":"是是是","nickname":"王小清","type":"0","timeSend":"2016-12-06 09:37:05.306","face":"\/data\/psmg\/2016\/09\/08\/201609081512371237kxvtgz.png"}
+   //         {"dataState":1,"dataModel":0,"data":{"PrivateChat":[{"id":154868,"P_SaveTime":"2016-12-06 10:22:08.447","P_SendContent":"{\"content\":\"刚给他\",\"nickname\":\"王小清\",\"type\":\"0\",\"timeSend\":\"2016-12-06 10:22:06.341\",\"face\":\"\\/data\\/psmg\\/2016\\/09\\/08\\/201609081512371237kxvtgz.png\"}","P_SenderGuid":"e303fe70-5104-474d-a41e-87e79ec01b17"}],"GroupChat":[],"Radio":[]}}
+      //      {"dataState":1,"dataModel":0,"data":"{\"content\":\"如风达\",\"nickname\":\"王小清\",\"type\":\"0\",\"timeSend\":\"2016-12-06 10:23:00.213\",\"face\":\"\\/data\\/psmg\\/2016\\/09\\/08\\/201609081512371237kxvtgz.png\"}"}
                 JSONObject json = new JSONObject();
-
                 try {
-                    json.put("content","wxq");
+                    json.put("content","大家好我是拉阿拉拉了");
                     json.put("type","0");
-                    json.put("timeSend",getCurrentTime());
+                    json.put("timeSend","2016-12-06 10:55:00.213");
                     json.put("nickname","王晓清");
                     json.put("face","/data/psmg/2016/09/08/201609081512371237kxvtgz.png");
-
-                    ChatMessageReq singchat = new ChatMessageReq(uid, uid2, json.toString());
+                    ChatMessageReq singchat = new ChatMessageReq(uid,uid2,json.toString());
                     boolean flag = ShakeAndVibrate.getInstance(this).addNettyPacket(singchat);
 
                 } catch (JSONException e) {

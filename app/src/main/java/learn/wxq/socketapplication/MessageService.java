@@ -25,7 +25,7 @@ public class MessageService extends Service {
     }
 
     private String testPhoneNumber="13222200760";
-    //private String testPhoneNumber="18862005675";
+  //  private String testPhoneNumber="18862005675";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -36,13 +36,12 @@ public class MessageService extends Service {
     @Override
     public void onCreate() {
 
-        ShakeAndVibrate.getInstance(MessageService.this).anewConnectSocker(0);
+      //  ShakeAndVibrate.getInstance(MessageService.this).anewConnectSocker(0);
         ShakeAndVibrate.getInstance(this).setAccountAndKey(testPhoneNumber);
         ShakeAndVibrate.getInstance(this).addDataParseListener(new DataParseListener() {
             @Override
             public void connectionClosed(int socketState) {
                 System.out.print("connectionClosed 异常");
-
                 Intent intent = new Intent(Global.TAKE_SHIBAI);
                 MessageService.this.sendBroadcast(intent);
                 Intent fail = new Intent(Global.LOGINFAIL);

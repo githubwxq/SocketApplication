@@ -100,7 +100,7 @@ public class ShakeAndVibrate  {
 
     }
 
-    //运行在子线程
+    //运行在子线程获取
     public int connectMain() {
         mainSocket = new Socket();
         try {
@@ -110,6 +110,9 @@ public class ShakeAndVibrate  {
 
             if(mainNetty.start()){
                 System.out.println("netty 连接分流服务器成功");
+
+            }else{
+                System.out.println("netty 连接分流服务器失败");
 
             }
 
@@ -669,7 +672,7 @@ public class ShakeAndVibrate  {
         return true;
     }
 
-    public boolean addNettyPacket(Packet packetdata) {
+    public boolean addNettyPacket(Packet packetdata) {  //发送数据
 //        try {
 //
 //            this.packet = packetdata;
@@ -765,9 +768,7 @@ public class ShakeAndVibrate  {
             //重新连接逻辑服务器
 
  //   关闭分流netty
-
-
-            mainNetty.stopPing();
+            mainNetty.stopPing(); //不需要心跳
             mainNetty=null;
             System.gc();
             shuntNetty=new NettyClientBootstrap(context,ip,20000,new DataListenerImpl2());

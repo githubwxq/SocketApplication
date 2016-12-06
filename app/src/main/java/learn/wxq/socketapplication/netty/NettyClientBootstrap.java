@@ -59,9 +59,9 @@ public class NettyClientBootstrap {
 
     public void sendMessage(final byte[]  msg)throws InterruptedException {
         System.out.println("发送各种消息信息");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
                 try {
                     if(socketChannel==null){
 
@@ -79,13 +79,12 @@ public class NettyClientBootstrap {
                     e.printStackTrace();
                 }
 
-            }
-        }).start();
+//            }
+//        }).start();
     }
 
 
     public Boolean start() throws InterruptedException {
-
         eventLoopGroup=new NioEventLoopGroup();
         bootstrap=new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
@@ -95,15 +94,11 @@ public class NettyClientBootstrap {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-
-
                 socketChannel.pipeline().addLast(new IdleStateHandler(20, 10, 0));  //配置心跳间隔
                 /*socketChannel.pipeline().addLast(new ObjectEncoder());
                 socketChannel.pipeline().addLast(new ObjectDecoder(ClassResolvers.cacheDisabled(null)));*/
                 nettyClientHandler = new NettyClientHandler(NettyClientBootstrap.this, dataListener);
                 socketChannel.pipeline().addLast(nettyClientHandler);
-
-
             }
         });
 
