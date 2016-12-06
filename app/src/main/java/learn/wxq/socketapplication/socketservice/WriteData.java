@@ -196,6 +196,7 @@ public class WriteData {
 
         byte[] dataLength=new byte[4];
         int count = packet.encodeArgs().getBytes().length +  packet.cmd.getBytes().length;
+        System.out.println("数据长度" + count);
         dataLength=DataUtil.inttoLH(count);
 
         //总共90个字节 为协议 剩下位数据

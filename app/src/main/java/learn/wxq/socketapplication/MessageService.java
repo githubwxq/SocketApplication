@@ -327,7 +327,8 @@ public class MessageService extends Service {
         TelephonyManager TelephonyMgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         String szImei = TelephonyMgr.getDeviceId();
         String time=getNewCurrentTime();
-        String type="0";//UserPreference.getInstance(this).getLoginType()  1deng  0 tuichu   867516023966903
+        String type="0";//UserPreference.getInstance(this).getLoginType()  1deng  0 tuichu   867516023966903  initData
+     //    ShakeAndVibrate.getInstance(MessageService.this).initData(time,type,"867516023966902");
         savTask = new SavTask(ShakeAndVibrate.getInstance(MessageService.this), MessageService.this, null, time, type, "867516023966902");
         savTask.execute();
         super.onCreate();

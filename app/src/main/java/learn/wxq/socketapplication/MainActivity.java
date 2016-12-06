@@ -21,6 +21,7 @@ import learn.wxq.socketapplication.socketservice.DataUtil;
 import learn.wxq.socketapplication.socketservice.PacketModel.AddFriendsReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.ChatMessageReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.ConnectReq;
+import learn.wxq.socketapplication.socketservice.PacketModel.GroupChatReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.LoginOffReq;
 import learn.wxq.socketapplication.socketservice.PacketModel.Packet;
 import learn.wxq.socketapplication.socketservice.ShakeAndVibrate;
@@ -32,9 +33,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView loginoff;
     private TextView  addfriend;
     private TextView  sing_chat;
-
+    private TextView   group_chat;
     NettyClientBootstrap nettyStart;
-
+   String classid="c5a08452-af06-4526-a3a7-e92fb4fd1494";
     String uid="e303fe70-5104-474d-a41e-87e79ec01b17";//wxq 账号
     String uid2="5b0f35c5-311a-46f1-8b94-1306b4c8bc3e";//ty 账号
     String photonumber1="13222200760";
@@ -62,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginoff.setOnClickListener(this);
         addfriend.setOnClickListener(this);
         sing_chat.setOnClickListener(this);
-
+        group_chat.setOnClickListener(this);
 
 //        new Thread(new Runnable() {
 //            @Override
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         loginoff = (TextView) findViewById(R.id.loginoff);
         addfriend=(TextView) findViewById(R.id.addfriend);
         sing_chat=(TextView) findViewById(R.id.sing_chat);
-
+        group_chat=(TextView) findViewById(R.id.group_chat);
     }
 
     @Override
@@ -267,7 +268,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
 
                 break;
+            case R.id.group_chat:
+                showToast("群聊");
+//{"content":"7744","nickname":"小糖","Roomname":"wxq","type":"0","timeSend":"2016-12-06 15:52:05.966","face":"\/data\/psmg\/2016\/11\/22\/201611221052215221lahirn.png"}
+                JSONObject json2 = new JSONObject();
+                try {
+                    json2.put("content","群聊");
+                    json2.put("type","0");
+                    json2.put("Roomname","wxq");
+                    json2.put("timeSend", "2016-12-06 10:55:00.213");
+                    json2.put("nickname","王晓清");
+                    json2.put("face","/data/psmg/2016/09/08/201609081512371237kxvtgz.png");
+                    GroupChatReq groupChatReq = new GroupChatReq(uid,classid,json2.toString());
+                    boolean flag = ShakeAndVibrate.getInstance(this).addNettyPacket(groupChatReq);
 
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+//                AddFriendsReq cr = new AddFriendsReq(uid, uid2,photonumber2);
+//                ShakeAndVibrate.getInstance(this).addPacket(cr);
+//                ShakeAndVibrate.getInstance(this).anewConnectSocker(0);
+
+                break;
 
 
 

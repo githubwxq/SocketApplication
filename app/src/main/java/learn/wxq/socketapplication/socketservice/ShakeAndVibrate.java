@@ -111,19 +111,21 @@ public class ShakeAndVibrate  {
             if(mainNetty.start()){
                 System.out.println("netty 连接分流服务器成功");
 
+              return 1;
             }else{
                 System.out.println("netty 连接分流服务器失败");
 
             }
 
 
-            is = mainSocket.getInputStream();
-            os = mainSocket.getOutputStream();
-
-            socketState = 1;//1代表分流服务器连接成功
-            if (is != null) { //有数据
-                return decodeMain();
-            }
+//            is = mainSocket.getInputStream();
+//            os = mainSocket.getOutputStream();
+//
+//            socketState = 1;//1代表分流服务器连接成功
+//            if (is != null) { //有数据
+//                return decodeMain();
+//            }
+            return 0;
 
         } catch (ConnectException e) {
             if (mainSocket != null) {
@@ -143,11 +145,13 @@ public class ShakeAndVibrate  {
             inAnewConnectSocker(0);
             e.printStackTrace();
             dataParseListener.connectionClosed(socketState);
-        } catch (JSONException e) {
-            inAnewConnectSocker(0);
-            dataParseListener.connectionClosed(socketState);
-            e.printStackTrace();
-        } catch (Exception e) {
+        }
+//        catch (JSONException e) {
+//            inAnewConnectSocker(0);
+//            dataParseListener.connectionClosed(socketState);
+//            e.printStackTrace();
+//        }
+        catch (Exception e) {
             inAnewConnectSocker(0);
             dataParseListener.connectionClosed(socketState);
             e.printStackTrace();
@@ -341,10 +345,10 @@ public class ShakeAndVibrate  {
             offtime = time;
             writeData = WriteData.getInstance();
             readData = ReadData.getInstance(dataParseListener);
-            is = shuntSocket.getInputStream();
-            os = shuntSocket.getOutputStream();
-            writeData.setOutputStream(os);
-            readData.setInputStream(is);
+//            is = shuntSocket.getInputStream();
+//            os = shuntSocket.getOutputStream();
+//            writeData.setOutputStream(os);
+//            readData.setInputStream(is);
             String uid = "000000000000000000000000000000000000";
             String key = "accountnumber=" + account + "&token=sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg&timestamp=" + timesTamp;
             key = sha1(key);
@@ -362,75 +366,47 @@ public class ShakeAndVibrate  {
         //  writeData.encode(packet); //给netty使用
             writeData.nettyEncode(packet, shuntNetty);
             } else {
+
             }
              socketState=3;//3代表逻辑服务器练级成功并登录成功
-            if (readData.readinfolink == null) {
-                readData = ReadData.getInstance(dataParseListener);
-                readData.readinfolink.writeThread.start();
-            } else if (readData.readinfolink != null && readData.readinfolink.writeThread.isAlive()) {
-            } else if (readData.readinfolink != null && !readData.readinfolink.writeThread.isAlive()) {
-                readData.readinfolink.writeThread.start();
-            }
-
-            readData.decode();
-        } catch (SocketException e) {
-            inAnewConnectSocker(0);
-            dataParseListener.connectionClosed(socketState);
-            e.printStackTrace();
-        } catch (SocketTimeoutException e) {
-            if (packet != null && packet.cmd.equals("Login")) {
-                inAnewConnectSocker(5);
-                dataParseListener.connectionClosed(socketState);
-                closeTimeTaskPing();
-            } else {
-                inAnewConnectSocker(4);
-                dataParseListener.loadingReconnect(socketState);
-            }
-            e.printStackTrace();
-        } catch (IOException e) {
-            inAnewConnectSocker(0);
-            dataParseListener.connectionClosed(socketState);
-            e.printStackTrace();
-        } catch (Exception e) {
+//            if (readData.readinfolink == null) {
+//                readData = ReadData.getInstance(dataParseListener);
+//                readData.readinfolink.writeThread.start();
+//            } else if (readData.readinfolink != null && readData.readinfolink.writeThread.isAlive()) {
+//            } else if (readData.readinfolink != null && !readData.readinfolink.writeThread.isAlive()) {
+//                readData.readinfolink.writeThread.start();
+//            }
+//
+//            readData.decode();
+        }
+//        catch (SocketException e) {
+//            inAnewConnectSocker(0);
+//            dataParseListener.connectionClosed(socketState);
+//            e.printStackTrace();
+//        }
+//        catch (SocketTimeoutException e) {
+//            if (packet != null && packet.cmd.equals("Login")) {
+//                inAnewConnectSocker(5);
+//                dataParseListener.connectionClosed(socketState);
+//                closeTimeTaskPing();
+//            } else {
+//                inAnewConnectSocker(4);
+//                dataParseListener.loadingReconnect(socketState);
+//            }
+//            e.printStackTrace();
+//        }
+//        catch (IOException e) {
+//            inAnewConnectSocker(0);
+//            dataParseListener.connectionClosed(socketState);
+//            e.printStackTrace();
+//        }
+        catch (Exception e) {
             inAnewConnectSocker(0);
             dataParseListener.connectionClosed(socketState);
             e.printStackTrace();
         }
         return 0;
     }
-
-
-
-
-    public int nettyLoginAction() {
-        try {
-            shuntNetty.sendMessage(getLoginData());//直接发送登录信息
-        } catch (Exception e) {
-            inAnewConnectSocker(0);
-            dataParseListener.connectionClosed(socketState);
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     //重新从主服务器开始连接的准备工作
     public void anewConnectSocker(int state) {
@@ -690,6 +666,10 @@ public class ShakeAndVibrate  {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
+
+
+
+
         writeData = WriteData.getInstance();
         packetdata.setTime(System.currentTimeMillis() + timedifference);
         writeData.nettyEncode(packetdata,shuntNetty);//shuntNetty
@@ -752,13 +732,8 @@ public class ShakeAndVibrate  {
     }
 
 
-
-
-
-
     class DataListenerImpl implements NettyClientHandler.DataListener{
         boolean isConnected=true;
-
         @Override
         public void dealWithData(String data) {
             System.out.println("我是来之分流服务器数据==========" + data);
@@ -775,11 +750,118 @@ public class ShakeAndVibrate  {
 
 
         }
+
+        @Override
+        public void dealWithByteData(byte[] data) {
+            System.out.println("我是来之分流服务器数据==========字节属猪" + data.toString());
+            //处理分流服务器返回数据
+            System.out.println("数据为" + new String( Arrays.copyOfRange(data, 90, data.length)));
+            int cmdlength = 0;
+            int cmdAndDatalength = 0;
+            boolean readflag = false;
+            byte[] buf = new byte[90];
+            buf=Arrays.copyOfRange(data, 0, 90);
+            RePacket rpacket = new RePacket(); // 包
+
+
+            byte[] titleb = Arrays.copyOfRange(buf, 0, 1);
+            int titlestr = DataUtil.toInt(titleb);
+            if (titlestr == SocketGlobal.TITLE) {
+                readflag = true;
+            }
+            titleb = null;
+
+
+            if (readflag) {
+                byte[] versionB = Arrays.copyOfRange(buf, 1, 3);
+                short versions = DataUtil.byte2short(versionB);
+                titleb = null;
+
+                byte[] cmdB = Arrays.copyOfRange(buf, 4, 5);
+                int cmdint = DataUtil.toInt(cmdB);
+                cmdlength = cmdint;
+                cmdB = null;
+
+                byte[] uidB = Arrays.copyOfRange(buf, 5, 41);
+                String uidlong = new String(uidB).toString();
+                rpacket.uid = uidlong;
+                uidB = null;
+
+                byte[] touidB = Arrays.copyOfRange(buf, 41, 77);
+                String touidlong = new String(touidB).toString();
+                rpacket.toUid = touidlong;
+                touidB = null;
+
+                byte[] timeB = Arrays.copyOfRange(buf, 77, 85);
+                long timelong = DataUtil.byteToLong(timeB);
+                rpacket.time = DataUtil.dateType(Long.toString(timelong));
+                timesTamp = timelong;
+                long currentTime = System.currentTimeMillis();
+                timedifference = timesTamp - currentTime;
+                timeB = null;
+
+                byte[] cmdAndDatalengthB = Arrays.copyOfRange(buf, 86, 90);
+                int cmdAndDatalengthint = DataUtil.toInt(cmdAndDatalengthB);
+
+                System.out.println("数据长度" + cmdAndDatalengthint);
+                cmdAndDatalength = cmdAndDatalengthint;
+                cmdAndDatalengthB = null;
+
+            }
+
+            byte[] temp =  Arrays.copyOfRange(data, 90, data.length);
+
+       //     temp= Arrays.copyOfRange(buf, 90, data.length);//数据字节数组
+            byte[] cmdS = Arrays.copyOfRange(temp, 0, cmdlength);// 命令字节
+            String cmdstr = new String(cmdS).toString();
+            System.out.println("cmdstr:+++" + cmdstr.toString());
+            rpacket.cmd = cmdstr;
+            byte[] datastrB = Arrays.copyOfRange(temp, cmdlength, cmdAndDatalength);
+            String datastr = new String(datastrB).toString();
+            System.out.println("data:+++" + datastr.toString());
+            rpacket.datastr = datastr;
+            temp = null;
+            cmdS = null;
+            datastrB = null;
+            buf = null;
+            System.gc();
+            try {
+            if (rpacket.cmd.equals("toConnect")) {
+                JSONObject dataObj = null;
+                    dataObj = new JSONObject(rpacket.datastr);
+
+                if (dataObj != null) {
+                    String ipstr = dataObj.getString("data");
+                    String[] ipArray = ipstr.split(":");
+                    if (ipArray != null && ipArray.length > 1) {
+                        shuntHost = ipArray[0];
+                        shuntPort = Integer.parseInt(ipArray[1]);
+                       // 关闭分流 启动逻辑
+                        mainNetty.stopPing(); //不需要心跳
+                        mainNetty=null;
+                        System.gc();
+                        //
+                        shuntNetty=new NettyClientBootstrap(context,shuntHost,shuntPort,new DataListenerImpl2());
+                        shuntNetty.start();
+                        //等露逻辑服务器
+
+                    } else {
+
+                    }
+                } else {
+
+                }
+
+            } else {
+
+            }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
-
-
-
-
 
     class DataListenerImpl2 implements NettyClientHandler.DataListener{
         boolean isConnected=true;
@@ -789,73 +871,14 @@ public class ShakeAndVibrate  {
             System.out.println("逻辑服务器返回数据为DataListenerImpl2==========" + data);
           //拿到返回数据
 
+        }
 
-
+        @Override
+        public void dealWithByteData(byte[] data) {
+            System.out.println("逻辑服务器返回数据为DataListenerImpl2==========字节数据" + new String( Arrays.copyOfRange(data, 90, data.length)));
         }
     }
 
-
-
-
-    private  byte[]  getLoginData() {
-        String account="13222200760";
-        String uid = "000000000000000000000000000000000000";
-        String key = "accountnumber=" + "13222200760" + "&token=sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg&timestamp=" + getCurrentTime();
-        String device="867516023966902";
-        long timesTamp=new Date().getTime();
-        String time=getCurrentTime();
-        Packet packet = new ConnectReq(uid, uid, account + "|" + key + "|" + " " + "|" + time + "|" + "0" + "|" + device, timesTamp);
-
-        byte[] biaoshi = WriteData.int2Bytes(SocketGlobal.TITLE, 1);
-        byte[] version = WriteData.int2Bytes(SocketGlobal.version,2);
-
-        byte[] hebing1=  byteMerger(biaoshi, version);
-
-
-        byte[] actiontype= WriteData.int2Bytes(packet.actiontype, 1);
-        byte[] cmdLength=WriteData.int2Bytes(packet.cmd.getBytes().length, 1);
-
-        byte[] hebing2=  byteMerger(actiontype, cmdLength);
-
-
-
-        byte[] packetuid=new byte[36];
-        packetuid=packet.uid.getBytes();
-
-        byte[] packettouid=new byte[36];
-        packettouid=packet.uid.getBytes();
-
-        byte[] hebing3=  byteMerger(actiontype, cmdLength);
-
-        byte[] packettime=DataUtil.longtoLH(packet.time);
-        byte[] ostype=WriteData.int2Bytes(SocketGlobal.ostype, 1);
-
-        byte[] hebing4= byteMerger(packettime, ostype);
-
-
-        byte[] dataLength=new byte[4];
-        int count = packet.encodeArgs().getBytes().length +  packet.cmd.getBytes().length;
-        dataLength=DataUtil.inttoLH(count);
-
-        //总共90个字节 为协议 剩下位数据
-
-        byte[] cmdAnddata = DataUtil.byteMerger(packet.cmd.getBytes(), packet.encodeArgs().getBytes());
-
-        byte[] hebing5= byteMerger(dataLength, cmdAnddata);
-
-        //组合成一个字节数组
-
-        byte[] merger1= byteMerger(hebing1,hebing2);
-        byte[] merger2=byteMerger(merger1,hebing3);
-        byte[] merger3=byteMerger(merger2,hebing4);
-        //最后字节
-        byte[] merger4=byteMerger(merger3,hebing5);
-
-
-        return merger4;  //最后协议和数据
-
-
-    }
     public  String getCurrentTime() {
         Date nowTime = new Date();
 

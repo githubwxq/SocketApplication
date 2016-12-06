@@ -62,12 +62,13 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
     }
     //这里是接受服务端发送过来的消息
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object baseMsg) throws Exception {
-//        ByteBuf buf  = (ByteBuf) baseMsg;
-//        byte[] bytes = new byte[ buf.readableBytes()];
-//        buf.readBytes(bytes);
-        String msg1=((ByteBuf)baseMsg).toString(CharsetUtil.UTF_8).trim();
-        dataListener.dealWithData("data:" + msg1);
-        ReferenceCountUtil.release(msg1);
+        ByteBuf buf  = (ByteBuf) baseMsg;
+        byte[] bytes = new byte[ buf.readableBytes()];
+        buf.readBytes(bytes);
+//        String msg1=((ByteBuf)baseMsg).toString(CharsetUtil.UTF_8).trim();
+//        dataListener.dealWithData("data:" + msg1);
+        dataListener.dealWithByteData(bytes);
+        ReferenceCountUtil.release(bytes);
     }
 
     
@@ -92,7 +93,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
 
 	public interface DataListener{
        void  dealWithData(String data);
-
+        void  dealWithByteData(byte[] data);
     }
 
 
