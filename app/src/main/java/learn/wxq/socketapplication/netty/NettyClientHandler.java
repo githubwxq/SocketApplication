@@ -3,6 +3,7 @@ package learn.wxq.socketapplication.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -76,24 +77,31 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        System.out.println("重连了。---------");
-        if(isPing){
-        nettyClient.startNetty();}else{
-            ctx.channel().close();
-        }
+  //      System.out.println("重连了。---------");
+//        if(isPing){
+//        nettyClient.startNetty();}else{
+//            ctx.channel().close();
+//        }
         //
     }
     //这里是出现异常的话要进行的操作
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)throws Exception {
 		super.exceptionCaught(ctx, cause);
+        if(isPing){  //l逻辑服务器出现的异常
+
+        }
         System.out.println("出现异常了。。。。。。。。。。。。。");
-		cause.printStackTrace();
+        Channel channel = ctx.channel();
+        if(channel.isActive())ctx.close();
+	//	cause.printStackTrace();
 	}
 
 	public interface DataListener{
        void  dealWithData(String data);
         void  dealWithByteData(byte[] data);
+
+
     }
 
 

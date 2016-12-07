@@ -28,13 +28,13 @@ public class SavTask extends AsyncTask<Void, Void, Void> {
 //        sav.loop();
         int a=sav.connectMain(); // 连接分流服务器
 
-   try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//   try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         //   if(a==1){
-          int b=sav.loginAction(time,logintype,device);
+      //    int b=sav.loginAction(time,logintype,device);
 
       //      sav.nettyLoginAction();
      //   }

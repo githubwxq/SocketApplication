@@ -17,6 +17,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
+import learn.wxq.socketapplication.socketservice.DataParseListener;
 import learn.wxq.socketapplication.socketservice.PacketModel.NetworkRequestUsingHttpDNS;
 import learn.wxq.socketapplication.socketservice.SocketGlobal;
 
@@ -35,27 +36,42 @@ public class NettyClientBootstrap {
     ChannelFuture future = null ;
     NettyClientHandler nettyClientHandler;
     public boolean isneedConnect=true;
+   private boolean flag;//默认是逻辑socket 为 false  风流的为true
 
+    private DataParseListener dataParseListener;
     public  void startNetty() throws InterruptedException {
         System.out.println("长链接开始");
         if(start()){
             System.out.println("长链接成功");
-//            ByteBuf bb = Unpooled.wrappedBuffer(("tableIP=asdf".getBytes(CharsetUtil.UTF_8)));
-//            socketChannel.writeAndFlush(bb);
+
+        }else{
+
+            System.out.println("长链接失败");
         }
     }
-     public NettyClientBootstrap(Context context ,String host,int port,NettyClientHandler.DataListener listener ) {
+    public NettyClientBootstrap(Context context ,String host,int port,NettyClientHandler.DataListener listener) {
+        this.context = context;
+        this.port=port;
+        this.host=host;
+        dataListener=listener;//回调数据
+
+
+
+
+    }
+     public NettyClientBootstrap(Context context ,String host,int port,NettyClientHandler.DataListener listener, DataParseListener dataParseListener,boolean flag) {
          this.context = context;
          this.port=port;
          this.host=host;
          dataListener=listener;//回调数据
+         this.dataParseListener=dataParseListener;
+         this.flag=flag;
 
     }
 
      public NettyClientBootstrap() {
 
      }
-
 
     public void sendMessage(final byte[]  msg)throws InterruptedException {
         System.out.println("发送各种消息信息");
@@ -132,9 +148,21 @@ public void stopPing(){
 
        socketChannel.closeFuture();
        eventLoopGroup.shutdownGracefully();
-      // socketChannel.close()
+       socketChannel.close();
     }
 
+    public void closeChannel() {
+        if (socketChannel != null) {
+            socketChannel.close();
+        }
+    }
 
+    public boolean isOpen() {
+        if (socketChannel != null) {
+            System.out.println(socketChannel.isOpen());
+            return socketChannel.isOpen();
+        }
+        return false;
+    }
 
 }
